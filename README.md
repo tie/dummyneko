@@ -39,7 +39,7 @@ Don't let the neko catch your mouse!
 
 ### Public domain
 
-Unlike the original JavaScript code, Web/猫 is published and distributed under the Unlicense and WTFPL.  Attribution is optional, but desirable.
+Unlike the [webneko.net](https://webneko.net/n200504.js) JavaScript code, Web/猫 is published and distributed under the Unlicense and WTFPL.  Attribution is optional, but desirable.
 
 Rationales for placing software in public domain are listed in [nothings/stb docs](https://github.com/nothings/stb/blob/master/docs/why_public_domain.md).
 
