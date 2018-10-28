@@ -140,7 +140,7 @@ function pointerNearby(p) {
 // - states
 
 function state_still(p, e, n) {
-  if(n == undefined) n = 0
+  if(n == undefined) n = 1
   let next = (n + 1) & 0xFF
 
   if(!pointerNearby(p)) {
@@ -207,7 +207,7 @@ function state_run(p, e, n) {
   if(n != 1 && n != 2) n = 1
 
   if(pointerNearby(p)) {
-    return state_still(p, e, n)
+    return state_still(p, e)
   }
 
   make_step(p)
