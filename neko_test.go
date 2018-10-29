@@ -8,67 +8,67 @@ func TestDirection(t *testing.T) {
 	cases := []struct{
 		x, y float64
 		mx, my float64
-		dir string
+		d dir
 	}{
 		{
 			0, 0,
 			0, 1,
-			"s",
+			dirS,
 		},
 		{
 			0, 0,
 			1, 1,
-			"se",
+			dirSE,
 		},
 		{ // exactly E
 			0, 0,
 			1, 0,
-			"e",
+			dirE,
 		},
 		{ // E -π
 			0, 0,
 			1, +.1,
-			"e",
+			dirE,
 		},
 		{ // E +π
 			0, 0,
 			1, -.1,
-			"e",
+			dirE,
 		},
 		{
 			0, 0,
 			1, -1,
-			"ne",
+			dirNE,
 		},
 		{
 			0, 0,
 			0, -1,
-			"n",
+			dirN,
 		},
 		{
 			0, 0,
 			-1, -1,
-			"nw",
+			dirNW,
 		},
 		{
 			0, 0,
 			-1, 0,
-			"w",
+			dirW,
 		},
 		{
 			0, 0,
 			-1, 1,
-			"sw",
+			dirSW,
 		},
 	}
 
 	for _, c := range cases {
-		dir := direction(c.x, c.y, c.mx, c.my)
-		if dir != c.dir {
+		d := direction(c.x, c.y, c.mx, c.my)
+		if d != c.d {
 			t.Errorf(
 				"Direction(%f, %f, %f, %f) expected %q, got %q",
 				c.x, c.y, c.mx, c.my,
-				c.dir, dir,
+				c.d, d,
 			)
 		}
 	}

@@ -6,7 +6,7 @@ import (
 
 type NekoState struct {
 	X, Y float64
-	Action ActionName
+	Action Action
 }
 
 type MouseState struct {
@@ -28,8 +28,7 @@ type NekoBehavior struct {
 	AlertTicks uint
 }
 
-type ActionName string
-
+type Action string
 const (
 	ActionAlert = "alert"
 	ActionStill = "still"
@@ -55,6 +54,18 @@ const (
 	ActionNWRun2 = "nwrun2"
 )
 
+type dir string
+const (
+	dirW = "W"
+	dirNW = "NW"
+	dirN = "N"
+	dirNE = "NE"
+	dirE = "E"
+	dirSW = "SW"
+	dirS = "S"
+	dirSE = "SE"
+)
+
 var (
 	InitialState ActionState = stateStill{}
 	DefaultBehavior = NekoBehavior{
@@ -72,54 +83,54 @@ const (
 	π = math.Pi
 )
 
-// dirActionName returns action name given the direction (see direction function) and whether the action is even.
+// runAction returns action name given the direction (see direction function) and whether the action is even.
 //
 // Returns values are hardcoded because go tool gives better coverage reports this way.
-func dirActionName(dir string, even bool) ActionName {
-	switch dir {
-	case "n":
+func runAction(d dir, even bool) Action {
+	switch d {
+	case dirN:
 		if even {
 			return ActionNRun2
 		} else {
 			return ActionNRun1
 		}
-	case "ne":
+	case dirNE:
 		if even {
 			return ActionNERun2
 		} else {
 			return ActionNERun1
 		}
-	case "E":
+	case dirE:
 		if even {
 			return ActionERun2
 		} else {
 			return ActionERun1
 		}
-	case "se":
+	case dirSE:
 		if even {
 			return ActionSERun2
 		} else {
 			return ActionSERun1
 		}
-	case "s":
+	case dirS:
 		if even {
 			return ActionSRun2
 		} else {
 			return ActionSRun1
 		}
-	case "sw":
+	case dirSW:
 		if even {
 			return ActionSWRun2
 		} else {
 			return ActionSWRun1
 		}
-	case "w":
+	case dirW:
 		if even {
 			return ActionWRun2
 		} else {
 			return ActionWRun1
 		}
-	case "nw":
+	case dirNW:
 		if even {
 			return ActionNWRun2
 		} else {
@@ -134,29 +145,29 @@ func dirActionName(dir string, even bool) ActionName {
 // Note that it assumes a coordinate system with inverted Y axis, i.e. with origin at the top-left corner.  Invoke it with inverted ordinate sign to use the classic cartesian coordinate system.
 //
 // Returns values are hardcoded because go tool gives better coverage reports this way.
-func direction(x, y, mx, my float64) string {
+func direction(x, y, mx, my float64) dir {
 	dx := x - mx
 	dy := y - my
 	α := math.Atan2(dy, dx)
 	switch {
 	case -π * 8/8 <= α && α <= -π * 7/8:
-		return "e"
+		return dirE
 	case -π * 7/8 <= α && α <= -π * 5/8:
-		return "se"
+		return dirSE
 	case -π * 5/8 <= α && α <= -π * 3/8:
-		return "s"
+		return dirS
 	case -π * 3/8 <= α && α <= -π * 1/8:
-		return "sw"
+		return dirSW
 	case -π * 1/8 <= α && α <= +π * 1/8:
-		return "w"
+		return dirW
 	case +π * 1/8 <= α && α <= +π * 3/8:
-		return "nw"
+		return dirNW
 	case +π * 3/8 <= α && α <= +π * 5/8:
-		return "n"
+		return dirN
 	case +π * 5/8 <= α && α <= +π * 7/8:
-		return "ne"
+		return dirNE
 	case +π * 7/8 <= α && α <= +π * 8/8:
-		return "e"
+		return dirE
 	}
 	return ""
 }
@@ -306,8 +317,8 @@ func (s stateRun) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
 
 func (s stateRun) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
 	if !pointerNearby(n, m, b) {
-		dir := direction(n.X, n.Y, m.X, m.Y)
-		n.Action = dirActionName(dir, s.even)
+		d := direction(n.X, n.Y, m.X, m.Y)
+		n.Action = runAction(d, s.even)
 	}
 	makeStep(&n, m, b)
 	return n
