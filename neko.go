@@ -70,7 +70,7 @@ var (
 	InitialState ActionState = stateStill{}
 	DefaultBehavior = NekoBehavior{
 		Step: 15,
-		Dmax: 15,
+		Dmax: 20,
 		StillTicks: 15,
 		YawnTicks: 4,
 		YawnStillTicks: 1,
