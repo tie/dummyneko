@@ -9,31 +9,22 @@ import (
 )
 
 func main() {
-	// neko.DefaultBehavior
 	n, m, b := neko.NekoState{}, neko.MouseState{}, neko.DefaultBehavior
 
-	global := js.Global()
-
-	doc := global.Get("document")
 	mouseUpdate := js.NewEventCallback(0, func(ev js.Value) {
 		m.X, m.Y = ev.Get("clientX").Float(), ev.Get("clientY").Float()
 	})
+
+	global := js.Global()
+	doc := global.Get("document")
 
 	doc.Call("addEventListener", "mousemove", mouseUpdate, false)
 	doc.Call("addEventListener", "mouseenter", mouseUpdate, false)
 
 	global.Get("window").Call("addEventListener", "load", js.NewEventCallback(0, func(js.Value) {
 		e := doc.Call("createElement", "img")
-		styles := e.Get("style")
-		styles.Set("position", "fixed")
-		styles.Set("width", "32px")
-		styles.Set("top", "0px")
-		styles.Set("left", "0px")
-		styles.Set("imageRendering", "pixelated")
-		styles.Set("draggable", false)
-
+		setupElement(e)
 		doc.Get("body").Call("appendChild", e)
-
 		s := neko.NewInitialState()
 		ticker := time.NewTicker(300 * time.Millisecond)
 		for {
@@ -47,6 +38,16 @@ func main() {
 			}
 		}
 	}))
+}
+
+func setupElement(e js.Value) {
+	styles := e.Get("style")
+	styles.Set("position", "fixed")
+	styles.Set("width", "32px")
+	styles.Set("top", "0px")
+	styles.Set("left", "0px")
+	styles.Set("imageRendering", "pixelated")
+	styles.Set("draggable", false)
 }
 
 func displayState(e js.Value, n neko.NekoState) {
