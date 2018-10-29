@@ -316,10 +316,8 @@ func (s stateRun) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
 }
 
 func (s stateRun) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
-	if !pointerNearby(n, m, b) {
-		d := direction(n.X, n.Y, m.X, m.Y)
-		n.Action = runAction(d, s.even)
-	}
+	d := direction(n.X, n.Y, m.X, m.Y)
+	n.Action = runAction(d, s.even)
 	makeStep(&n, m, b)
 	return n
 }
