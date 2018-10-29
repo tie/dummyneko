@@ -67,7 +67,6 @@ const (
 )
 
 var (
-	InitialState ActionState = stateStill{}
 	DefaultBehavior = NekoBehavior{
 		Step: 15,
 		Dmax: 20,
@@ -195,6 +194,20 @@ func makeStep(n *NekoState, m MouseState, b NekoBehavior) {
 type ActionState interface {
 	Next(NekoState, MouseState, NekoBehavior) ActionState
 	Render(NekoState, MouseState, NekoBehavior) NekoState
+}
+
+func NewInitialState() ActionState {
+	return initialState{}
+}
+
+type initialState struct{}
+
+func (initialState) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
+	return stateStill{}
+}
+
+func (initialState) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
+	return n
 }
 
 type stateStill struct {

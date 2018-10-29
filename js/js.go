@@ -34,17 +34,16 @@ func main() {
 
 		doc.Get("body").Call("appendChild", e)
 
-		s := neko.InitialState
-		n = s.Render(n, m, b)
-		displayState(e, n)
-
+		s := neko.NewInitialState()
 		ticker := time.NewTicker(300 * time.Millisecond)
 		for {
+			s = s.Next(n, m, b)
+			n = s.Render(n, m, b)
+			displayState(e, n)
+
 			select {
 			case <-ticker.C:
-				s = s.Next(n, m, b)
-				n = s.Render(n, m, b)
-				displayState(e, n)
+				continue
 			}
 		}
 	}))
