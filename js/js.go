@@ -16,7 +16,7 @@ func main() {
 
 	doc := global.Get("document")
 	mouseUpdate := js.NewEventCallback(0, func(ev js.Value) {
-		m.X, m.Y = ev.Get("pageX").Float(), ev.Get("pageY").Float()
+		m.X, m.Y = ev.Get("clientX").Float(), ev.Get("clientY").Float()
 	})
 
 	doc.Call("addEventListener", "mousemove", mouseUpdate, false)
@@ -25,7 +25,7 @@ func main() {
 	global.Get("window").Call("addEventListener", "load", js.NewEventCallback(0, func(js.Value) {
 		e := doc.Call("createElement", "img")
 		styles := e.Get("style")
-		styles.Set("position", "absolute")
+		styles.Set("position", "fixed")
 		styles.Set("width", "32px")
 		styles.Set("top", "0px")
 		styles.Set("left", "0px")
