@@ -401,16 +401,11 @@ func TestStatesChain(t *testing.T) {
 	}
 
 	var n NekoState
-	var s ActionState
+	s := NewInitialState()
 	for _, c := range states {
-		if s != nil {
-			s = s.Next(n, c.m, c.b)
-			if s == nil {
-				t.Fatal("Next returned nil state")
-			}
-		} else {
-			// initial state: check Render return value
-			s = stateStill{}
+		s = s.Next(n, c.m, c.b)
+		if s == nil {
+			t.Fatal("Next returned nil state")
 		}
 
 		n = s.Render(n, c.m, c.b)
