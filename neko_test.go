@@ -398,6 +398,48 @@ func TestStatesChain(t *testing.T) {
 				AlertTicks: 1,
 			},
 		},
+		{
+			e: NekoState{X:4,Y:0,Action:ActionAlert},
+			m: MouseState{X:0,Y:0},
+			b: NekoBehavior{
+				Step: 1,
+				StillTicks: 1,
+				YawnTicks: 1,
+				YawnStillTicks: 2,
+				SleepTicks: 1,
+				AlertTicks: 1,
+			},
+		},
+		{
+			e: NekoState{X:3,Y:0,Action:ActionWRun1},
+			m: MouseState{X:0,Y:0},
+			b: NekoBehavior{Step:1},
+		},
+		{
+			e: NekoState{X:2,Y:0,Action:ActionWRun2},
+			m: MouseState{X:0,Y:0},
+			b: NekoBehavior{Step:1},
+		},
+		{
+			e: NekoState{X:1,Y:0,Action:ActionWRun1},
+			m: MouseState{X:0,Y:0},
+			b: NekoBehavior{Step:1},
+		},
+		{
+			e: NekoState{X:0,Y:0,Action:ActionWRun2},
+			m: MouseState{X:0,Y:0},
+			b: NekoBehavior{Step:1},
+		},
+		{
+			e: NekoState{X:-3,Y:-4,Action:ActionNWRun1},
+			m: MouseState{X:-6,Y:-8},
+			b: NekoBehavior{Step:5},
+		},
+		{
+			e: NekoState{X:-6,Y:-8,Action:ActionNWRun1},
+			m: MouseState{X:-6,Y:-8},
+			b: NekoBehavior{Step:5},
+		},
 	}
 
 	var n NekoState
