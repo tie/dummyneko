@@ -5,13 +5,26 @@ workflows:
   tests:
     jobs:
       - test
+      - codecov:
+          requires: [ test ]
 
 jobs:
   test:
     docker:
       - image: circleci/golang:1.11.1
+    environment:
+      CGO_ENABLED: 0
     steps:
       - checkout
       - run:
           name: Running tests
-          command: go test -v -cover
+          command: go test -v -coverprofile=cover.out -covermode=count
+      - persist_to_workspace:
+          root: .
+          paths: [ cover.out ]
+  codecov:
+    docker:
+       - image: plugins/codecov:2.0.3
+    steps:
+      - attach_workspace: { at: . }
+      - run: codecov
