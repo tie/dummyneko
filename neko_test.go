@@ -436,7 +436,7 @@ func TestStatesChain(t *testing.T) {
 			b: NekoBehavior{Step:5},
 		},
 		{
-			e: NekoState{X:-6,Y:-8,Action:ActionNWRun1},
+			e: NekoState{X:-6,Y:-8,Action:ActionNWRun2},
 			m: MouseState{X:-6,Y:-8},
 			b: NekoBehavior{Step:5},
 		},
