@@ -18,10 +18,10 @@ jobs:
       - checkout
       - run:
           name: Running tests
-          command: go test -v -coverprofile=cover.out -covermode=count
+          command: go test -v -coverprofile=coverage.txt -covermode=count
       - persist_to_workspace:
           root: .
-          paths: [ cover.out ]
+          paths: [ coverage.txt ]
   codecov:
     docker:
        - image: plugins/codecov:2.0.3
