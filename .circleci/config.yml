@@ -26,5 +26,6 @@ jobs:
     docker:
        - image: plugins/codecov:2.0.3
     steps:
+      - checkout
       - attach_workspace: { at: . }
       - run: codecov
