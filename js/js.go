@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"time"
+	"strconv"
 	"github.com/gopherjs/gopherwasm/js"
 
 	neko "github.com/tie/dummyneko"
@@ -16,6 +16,15 @@ func main() {
 	})
 
 	global := js.Global()
+
+	go func() {
+		image := global.Get("Image")
+		for _, a := range neko.SupportedActions {
+			img := image.New()
+			img.Set("src", imgUrl(a))
+		}
+	}()
+
 	doc := global.Get("document")
 
 	doc.Call("addEventListener", "mousemove", mouseUpdate, false)
@@ -52,10 +61,15 @@ func setupElement(e js.Value) {
 
 func displayState(e js.Value, n neko.NekoState) {
 	style := e.Get("style")
-	style.Set("left", fmt.Sprintf("%fpx", n.X))
-	style.Set("top", fmt.Sprintf("%fpx", n.Y))
-	e.Set("src", fmt.Sprintf(
-		"https://b1nary.tk/ass/webneko.net/socks/%s.gif",
-		n.Action,
-	))
+	style.Set("left", f2px(n.X))
+	style.Set("top", f2px(n.Y))
+	e.Set("src", imgUrl(n.Action))
+}
+
+func imgUrl(a neko.Action) neko.Action {
+	return "https://b1nary.tk/ass/webneko.net/socks/" + a + ".gif"
+}
+
+func f2px(f float64) string {
+	return strconv.FormatFloat(f, 'f', -1, 64) + "px"
 }
