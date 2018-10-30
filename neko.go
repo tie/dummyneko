@@ -29,10 +29,15 @@ type NekoBehavior struct {
 }
 
 type Action string
+
 const (
 	ActionAlert = "alert"
 	ActionStill = "still"
 	ActionYawn = "yawn"
+	// itch
+	ActionItch1 = "itch1"
+	ActionItch2 = "itch2"
+	// sleep
 	ActionSleep1 = "sleep1"
 	ActionSleep2 = "sleep2"
 	// run
@@ -52,9 +57,46 @@ const (
 	ActionWRun2 = "wrun2"
 	ActionNWRun1 = "nwrun1"
 	ActionNWRun2 = "nwrun2"
+	// scratch
+	ActionNScratch1 = "nscratch1"
+	ActionNScratch2 = "nscratch2"
+	ActionEScratch1 = "escratch1"
+	ActionEScratch2 = "escratch2"
+	ActionSScratch1 = "sscratch1"
+	ActionSScratch2 = "sscratch2"
+	ActionWScratch1 = "wscratch1"
+	ActionWScratch2 = "wscratch2"
+)
+
+var (
+	// SupportedActions is a list of implemented action.
+	SupportedActions = []Action{
+		ActionAlert,
+		ActionStill,
+		ActionYawn,
+		ActionSleep1,
+		ActionSleep2,
+		ActionNRun1,
+		ActionNRun2,
+		ActionNERun1,
+		ActionNERun2,
+		ActionERun1,
+		ActionERun2,
+		ActionSERun1,
+		ActionSERun2,
+		ActionSRun1,
+		ActionSRun2,
+		ActionSWRun1,
+		ActionSWRun2,
+		ActionWRun1,
+		ActionWRun2,
+		ActionNWRun1,
+		ActionNWRun2,
+	}
 )
 
 type dir string
+
 const (
 	dirW = "W"
 	dirNW = "NW"
