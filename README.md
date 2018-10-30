@@ -4,6 +4,9 @@
 
 [Neko](https://en.wikipedia.org/wiki/Neko_%28software%29) for the web, somewhat compatible with [WebNeko](https://webneko.net).
 
+[![circleci](https://circleci.com/gh/tie/dummyneko.svg?style=shield)](https://circleci.com/gh/tie/dummyneko)
+[![codecov](https://codecov.io/gh/tie/dummyneko/coverage.svg)](https://codecov.io/gh/tie/dummyneko)
+
 ## Preview
 
 You can find a cat waiting for mouse on all pages at [b1nary.tk](https://b1nary.tk).
@@ -25,7 +28,9 @@ Don't let the neko catch your mouse!
 - state_scratch
 - state_itch
 - home position
-- refactoring
+- refactoring (JS only)
+
+  Note that there is a cleaner Go/GopherJS port, which should (probably) also compile for the *js/wasm* target.  Though only state machine is currently covered by tests.
 
 ## Known bugs and workarounds.
 
