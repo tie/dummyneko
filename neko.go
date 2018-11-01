@@ -18,14 +18,24 @@ type NekoBehavior struct {
 	Step float64
 	// max distance between mouse and neko
 	Dmax float64
+	// StillTransition is the next state after Still state
+	//
+	// Values
+	//   0: Yawn
+	//   1: Itch
+	//   2: Scratch
+	StillTransition uint
 
 	// ticks per state
 
 	StillTicks uint
-	YawnTicks uint
-	YawnStillTicks uint
+	YawnTicks, PostYawnTicks uint
 	SleepTicks uint
 	AlertTicks uint
+	RunTicks uint
+
+	ItchTicks, ItchCount, PostItchTicks uint
+	ScratchTicks, PostScratchTicks uint
 }
 
 type Action string
@@ -74,6 +84,8 @@ var (
 		ActionAlert,
 		ActionStill,
 		ActionYawn,
+		ActionItch1,
+		ActionItch2,
 		ActionSleep1,
 		ActionSleep2,
 		ActionNRun1,
@@ -112,11 +124,15 @@ var (
 	DefaultBehavior = NekoBehavior{
 		Step: 15,
 		Dmax: 20,
-		StillTicks: 15,
+		StillTransition: 1,
+		StillTicks: 16,
 		YawnTicks: 4,
-		YawnStillTicks: 1,
+		PostYawnTicks: 4,
 		SleepTicks: 2,
 		AlertTicks: 2,
+		ItchTicks: 1,
+		ItchCount: 6,
+		PostItchTicks: 8,
 	}
 )
 
@@ -262,12 +278,106 @@ func (s stateStill) Next(n NekoState, m MouseState, b NekoBehavior) ActionState 
 	}
 	s.tick += 1
 	if s.tick >= b.StillTicks {
+		return s.selectNext(n, m, b)
+	}
+	return s
+}
+
+func (s stateStill) selectNext(n NekoState, m MouseState, b NekoBehavior) ActionState {
+	switch b.StillTransition {
+	case 1:
+		return stateItch{}
+	case 2:
+		return stateScratch{}
+	}
+	return stateYawn{}
+}
+
+func (s stateStill) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
+	n.Action = ActionStill
+	return n
+}
+
+type stateItch struct {
+	tick uint
+	even bool
+	count uint
+}
+
+func (s stateItch) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
+	if !pointerNearby(n, m, b) {
+		return stateAlert{}
+	}
+	s.tick += 1
+	if s.tick >= b.ItchTicks {
+		s.tick = 0
+		s.even = !s.even
+		s.count += 1
+	}
+	if s.count >= b.ItchCount {
+		return statePostItch{}
+	}
+	return s
+}
+
+func (s stateItch) Render(n NekoState, m MouseState, b NekoBehavior)  NekoState {
+	if s.even {
+		n.Action = ActionItch2
+	} else {
+		n.Action = ActionItch1
+	}
+	return n
+}
+
+type statePostItch struct {
+	tick uint
+}
+
+func (s statePostItch) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
+	if !pointerNearby(n, m, b) {
+		return stateAlert{}
+	}
+	s.tick += 1
+	if s.tick >= b.PostItchTicks {
 		return stateYawn{}
 	}
 	return s
 }
 
-func (s stateStill) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
+func (s statePostItch) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
+	n.Action = ActionStill
+	return n
+}
+
+type stateScratch struct {
+}
+
+func (s stateScratch) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
+	// TODO
+	return nil
+}
+
+func (s stateScratch) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
+	// TODO
+	return n
+}
+
+type statePostScratch struct {
+	tick uint
+}
+
+func (s statePostScratch) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
+	if !pointerNearby(n, m, b) {
+		return stateAlert{}
+	}
+	s.tick += 1
+	if s.tick >= b.PostScratchTicks {
+		return stateYawn{}
+	}
+	return s
+}
+
+func (s statePostScratch) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
 	n.Action = ActionStill
 	return n
 }
@@ -282,7 +392,7 @@ func (s stateYawn) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
 	}
 	s.tick += 1
 	if s.tick >= b.YawnTicks {
-		return stateYawnStill{}
+		return statePostYawn{}
 	}
 	return s
 }
@@ -292,22 +402,22 @@ func (s stateYawn) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
 	return n
 }
 
-type stateYawnStill struct {
+type statePostYawn struct {
 	tick uint
 }
 
-func (s stateYawnStill) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
+func (s statePostYawn) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
 	s.tick += 1
-	if s.tick >= b.YawnStillTicks {
+	if s.tick >= b.PostYawnTicks {
 		return stateSleep{}
 	}
 	return s
 }
 
-func (s stateYawnStill) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
+func (s statePostYawn) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
 	n.Action = ActionStill
 	return n
 }
@@ -359,6 +469,7 @@ func (s stateAlert) Render(n NekoState, m MouseState, b NekoBehavior) NekoState 
 }
 
 type stateRun struct {
+	tick uint
 	even bool
 }
 
@@ -366,7 +477,11 @@ func (s stateRun) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
 	if pointerNearby(n, m, b) {
 		return stateStill{}
 	}
-	s.even = !s.even
+	s.tick += 1
+	if s.tick >= b.RunTicks {
+		s.tick = 0
+		s.even = !s.even
+	}
 	return s
 }
 
