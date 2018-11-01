@@ -54,13 +54,13 @@ func main() {
 }
 
 func setupElement(e js.Value) {
+	e.Set("draggable", false)
 	styles := e.Get("style")
 	styles.Set("position", "fixed")
 	styles.Set("width", "32px")
 	styles.Set("top", "0px")
 	styles.Set("left", "0px")
 	styles.Set("imageRendering", "pixelated")
-	styles.Set("draggable", false)
 }
 
 func displayState(e js.Value, n neko.NekoState) {
