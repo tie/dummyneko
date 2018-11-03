@@ -43,10 +43,14 @@ func main() {
 
 			select {
 			case <-ticker.C:
-				b.StillTransition += 1
-				// TODO: scratch is not implemented
-				// we only use transitions Yawn(0) and Itch(1)
-				b.StillTransition &= 1
+				switch b.StillTransition {
+				case 0:
+					b.StillTransition = 2
+				case 1:
+					b.StillTransition = 0
+				case 2:
+					b.StillTransition = 1
+				}
 				continue
 			}
 		}

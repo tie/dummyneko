@@ -74,6 +74,96 @@ func TestDirection(t *testing.T) {
 	}
 }
 
+func TestMajorDirection(t *testing.T) {
+	cases := []struct{
+		x, y float64
+		mx, my float64
+		d dir
+	}{
+		{
+			0, 0,
+			0, 1,
+			dirS,
+		},
+		{
+			0, 0,
+			1.1, 1,
+			dirE,
+		},
+		{
+			0, 0,
+			1, 1.1,
+			dirS,
+		},
+		{ // exactly E
+			0, 0,
+			1, 0,
+			dirE,
+		},
+		{ // E -π
+			0, 0,
+			1, +.1,
+			dirE,
+		},
+		{ // E +π
+			0, 0,
+			1, -.1,
+			dirE,
+		},
+		{
+			0, 0,
+			1.1, -1,
+			dirE,
+		},
+		{
+			0, 0,
+			1, -1.1,
+			dirN,
+		},
+		{
+			0, 0,
+			0, -1,
+			dirN,
+		},
+		{
+			0, 0,
+			-1.1, -1,
+			dirW,
+		},
+		{
+			0, 0,
+			-1, -1.1,
+			dirN,
+		},
+		{
+			0, 0,
+			-1, 0,
+			dirW,
+		},
+		{
+			0, 0,
+			-1.1, 1,
+			dirW,
+		},
+		{
+			0, 0,
+			-1, 1.1,
+			dirS,
+		},
+	}
+
+	for _, c := range cases {
+		d := majorDirection(c.x, c.y, c.mx, c.my)
+		if d != c.d {
+			t.Errorf(
+				"Direction(%f, %f, %f, %f) expected %q, got %q",
+				c.x, c.y, c.mx, c.my,
+				c.d, d,
+			)
+		}
+	}
+}
+
 func TestStatesChain(t *testing.T) {
 	states := []struct{
 		e NekoState

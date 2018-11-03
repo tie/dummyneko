@@ -35,7 +35,9 @@ type NekoBehavior struct {
 	RunTicks uint
 
 	ItchTicks, ItchCount, PostItchTicks uint
-	ScratchTicks, PostScratchTicks uint
+	ScratchTicks, ScratchCount, PostScratchTicks uint
+	// Disable transition from Scratch to Alert state
+	ScratchDisableAlert bool
 }
 
 type Action string
@@ -44,13 +46,10 @@ const (
 	ActionAlert = "alert"
 	ActionStill = "still"
 	ActionYawn = "yawn"
-	// itch
 	ActionItch1 = "itch1"
 	ActionItch2 = "itch2"
-	// sleep
 	ActionSleep1 = "sleep1"
 	ActionSleep2 = "sleep2"
-	// run
 	ActionNRun1 = "nrun1"
 	ActionNRun2 = "nrun2"
 	ActionNERun1 = "nerun1"
@@ -67,7 +66,6 @@ const (
 	ActionWRun2 = "wrun2"
 	ActionNWRun1 = "nwrun1"
 	ActionNWRun2 = "nwrun2"
-	// scratch
 	ActionNScratch1 = "nscratch1"
 	ActionNScratch2 = "nscratch2"
 	ActionEScratch1 = "escratch1"
@@ -84,10 +82,13 @@ var (
 		ActionAlert,
 		ActionStill,
 		ActionYawn,
+		// itch
 		ActionItch1,
 		ActionItch2,
+		// sleep
 		ActionSleep1,
 		ActionSleep2,
+		// run
 		ActionNRun1,
 		ActionNRun2,
 		ActionNERun1,
@@ -104,6 +105,15 @@ var (
 		ActionWRun2,
 		ActionNWRun1,
 		ActionNWRun2,
+		// scratch
+		ActionNScratch1,
+		ActionNScratch2,
+		ActionEScratch1,
+		ActionEScratch2,
+		ActionSScratch1,
+		ActionSScratch2,
+		ActionWScratch1,
+		ActionWScratch2,
 	}
 )
 
@@ -125,14 +135,21 @@ var (
 		Step: 15,
 		Dmax: 20,
 		StillTransition: 1,
-		StillTicks: 16,
-		YawnTicks: 4,
-		PostYawnTicks: 4,
+		StillTicks: 4,
 		SleepTicks: 2,
 		AlertTicks: 2,
+
+		YawnTicks: 4,
+		PostYawnTicks: 4,
+
 		ItchTicks: 1,
 		ItchCount: 6,
-		PostItchTicks: 8,
+		PostItchTicks: 4,
+
+		ScratchTicks: 2,
+		ScratchCount: 4,
+		PostScratchTicks: 4,
+		ScratchDisableAlert: true,
 	}
 )
 
@@ -140,10 +157,9 @@ const (
 	π = math.Pi
 )
 
-// runAction returns action name given the direction (see direction function) and whether the action is even.
-//
-// Returns values are hardcoded because go tool gives better coverage reports this way.
+// runAction returns action name for Run state given the direction (see direction function) and whether the action is even.
 func runAction(d dir, even bool) Action {
+	// Return values are hardcoded because go tool gives better coverage reports this way.
 	switch d {
 	case dirN:
 		if even {
@@ -197,12 +213,44 @@ func runAction(d dir, even bool) Action {
 	return ""
 }
 
-// direction function computes the compass direction to the destination given the current (x,y) and the destination (mx,my) coordinates.
+// scratchAction returns action name for Scratch state given the major direction (see majorDirection function) and whether the action is even.
+func scratchAction(d dir, even bool) Action {
+	switch d {
+	case dirN:
+		if even {
+			return ActionNScratch2
+		} else {
+			return ActionNScratch1
+		}
+	case dirE:
+		if even {
+			return ActionEScratch2
+		} else {
+			return ActionEScratch1
+		}
+	case dirS:
+		if even {
+			return ActionSScratch2
+		} else {
+			return ActionSScratch1
+		}
+	case dirW:
+		if even {
+			return ActionWScratch2
+		} else {
+			return ActionWScratch1
+		}
+	}
+	return ""
+}
+
+// direction function computes the compass direction at the (x,y) to the destination (mx,my) coordinates.
+//
+// Return values are: E, SE, S, SW, W, NW, N, NE.
 //
 // Note that it assumes a coordinate system with inverted Y axis, i.e. with origin at the top-left corner.  Invoke it with inverted ordinate sign to use the classic cartesian coordinate system.
-//
-// Returns values are hardcoded because go tool gives better coverage reports this way.
 func direction(x, y, mx, my float64) dir {
+	// Return values are hardcoded because go tool gives better coverage reports this way.
 	dx := x - mx
 	dy := y - my
 	α := math.Atan2(dy, dx)
@@ -224,6 +272,31 @@ func direction(x, y, mx, my float64) dir {
 	case +π * 5/8 <= α && α <= +π * 7/8:
 		return dirNE
 	case +π * 7/8 <= α && α <= +π * 8/8:
+		return dirE
+	}
+	return ""
+}
+
+// majorDirection function computes the major compass direction at the (x,y) to the destination (mx,my) coordinates.
+//
+// The major compass directions are: E, S, W, N.
+//
+// Note that it assumes a coordinate system with inverted Y axis, i.e. with origin at the top-left corner.  Invoke it with inverted ordinate sign to use the classic cartesian coordinate system.
+func majorDirection(x, y, mx, my float64) dir {
+	// Return values are hardcoded because go tool gives better coverage reports this way.
+	dx := x - mx
+	dy := y - my
+	α := math.Atan2(dy, dx)
+	switch {
+	case -π * 4/4 <= α && α <= -π * 3/4:
+		return dirE
+	case -π * 3/4 <= α && α <= -π * 1/4:
+		return dirS
+	case -π * 1/4 <= α && α <= +π * 1/4:
+		return dirW
+	case +π * 1/4 <= α && α <= +π * 3/4:
+		return dirN
+	case +π * 3/4 <= α && α <= +π * 4/4:
 		return dirE
 	}
 	return ""
@@ -350,15 +423,30 @@ func (s statePostItch) Render(n NekoState, m MouseState, b NekoBehavior) NekoSta
 }
 
 type stateScratch struct {
+	tick uint
+	even bool
+	count uint
 }
 
 func (s stateScratch) Next(n NekoState, m MouseState, b NekoBehavior) ActionState {
-	// TODO
-	return nil
+	if !b.ScratchDisableAlert && !pointerNearby(n, m, b) {
+		return stateAlert{}
+	}
+	s.tick += 1
+	if s.tick >= b.ScratchTicks {
+		s.tick = 0
+		s.even = !s.even
+		s.count += 1
+	}
+	if s.count >= b.ScratchCount {
+		return statePostScratch{}
+	}
+	return s
 }
 
 func (s stateScratch) Render(n NekoState, m MouseState, b NekoBehavior) NekoState {
-	// TODO
+	d := majorDirection(n.X, n.Y, m.X, m.Y)
+	n.Action = scratchAction(d, s.even)
 	return n
 }
 
