@@ -1,0 +1,13 @@
+Before
+
+-> Still -> Yawn -> PostYawn -> Sleep
+
+After
+
+-> Still | ----------------------------> Yawn -> PostYawn -> Sleep
+         | -> Itch     -> PostItch    -> Yawn -> PostYawn -> Sleep
+         | -> Scratch  -> PostScratch -> Yawn -> PostYawn -> Sleep
+
+-> Still -> Yawn -> PostYawn -> Sleep
+-> Still -> Itch -> PostItch -> Yawn -> PostYawn -> Sleep
+-> Still -> Scratch -> PostScratch -> Yawn -> PostYawn -> Sleep
