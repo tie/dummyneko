@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	n, m, b := neko.NekoState{}, neko.MouseState{}, neko.DefaultBehavior
+	n, m, b := neko.NekoState{}, neko.MouseState{}, neko.DefaultOptions
 
 	mouseUpdate := js.NewEventCallback(0, func(ev js.Value) {
 		m.X, m.Y = ev.Get("clientX").Float(), ev.Get("clientY").Float()
