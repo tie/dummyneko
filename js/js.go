@@ -1,8 +1,9 @@
 package main
 
 import (
-	"time"
 	"strconv"
+	"time"
+
 	"github.com/gopherjs/gopherwasm/js"
 
 	neko "github.com/tie/dummyneko"

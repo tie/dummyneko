@@ -5,7 +5,7 @@ import (
 )
 
 type NekoState struct {
-	X, Y float64
+	X, Y   float64
 	Action Action
 }
 
@@ -28,13 +28,13 @@ type Options struct {
 
 	// ticks per state
 
-	StillTicks uint
+	StillTicks               uint
 	YawnTicks, PostYawnTicks uint
-	SleepTicks uint
-	AlertTicks uint
-	RunTicks uint
+	SleepTicks               uint
+	AlertTicks               uint
+	RunTicks                 uint
 
-	ItchTicks, ItchCount, PostItchTicks uint
+	ItchTicks, ItchCount, PostItchTicks          uint
 	ScratchTicks, ScratchCount, PostScratchTicks uint
 	// Disable transition from Scratch to Alert state
 	ScratchDisableAlert bool
@@ -43,29 +43,29 @@ type Options struct {
 type Action string
 
 const (
-	ActionAlert = "alert"
-	ActionStill = "still"
-	ActionYawn = "yawn"
-	ActionItch1 = "itch1"
-	ActionItch2 = "itch2"
-	ActionSleep1 = "sleep1"
-	ActionSleep2 = "sleep2"
-	ActionNRun1 = "nrun1"
-	ActionNRun2 = "nrun2"
-	ActionNERun1 = "nerun1"
-	ActionNERun2 = "nerun2"
-	ActionERun1 = "erun1"
-	ActionERun2 = "erun2"
-	ActionSERun1 = "serun1"
-	ActionSERun2 = "serun2"
-	ActionSRun1 = "srun1"
-	ActionSRun2 = "srun2"
-	ActionSWRun1 = "swrun1"
-	ActionSWRun2 = "swrun2"
-	ActionWRun1 = "wrun1"
-	ActionWRun2 = "wrun2"
-	ActionNWRun1 = "nwrun1"
-	ActionNWRun2 = "nwrun2"
+	ActionAlert     = "alert"
+	ActionStill     = "still"
+	ActionYawn      = "yawn"
+	ActionItch1     = "itch1"
+	ActionItch2     = "itch2"
+	ActionSleep1    = "sleep1"
+	ActionSleep2    = "sleep2"
+	ActionNRun1     = "nrun1"
+	ActionNRun2     = "nrun2"
+	ActionNERun1    = "nerun1"
+	ActionNERun2    = "nerun2"
+	ActionERun1     = "erun1"
+	ActionERun2     = "erun2"
+	ActionSERun1    = "serun1"
+	ActionSERun2    = "serun2"
+	ActionSRun1     = "srun1"
+	ActionSRun2     = "srun2"
+	ActionSWRun1    = "swrun1"
+	ActionSWRun2    = "swrun2"
+	ActionWRun1     = "wrun1"
+	ActionWRun2     = "wrun2"
+	ActionNWRun1    = "nwrun1"
+	ActionNWRun2    = "nwrun2"
 	ActionNScratch1 = "nscratch1"
 	ActionNScratch2 = "nscratch2"
 	ActionEScratch1 = "escratch1"
@@ -76,82 +76,78 @@ const (
 	ActionWScratch2 = "wscratch2"
 )
 
-var (
-	// SupportedActions is a list of implemented action.
-	SupportedActions = []Action{
-		ActionAlert,
-		ActionStill,
-		ActionYawn,
-		// itch
-		ActionItch1,
-		ActionItch2,
-		// sleep
-		ActionSleep1,
-		ActionSleep2,
-		// run
-		ActionNRun1,
-		ActionNRun2,
-		ActionNERun1,
-		ActionNERun2,
-		ActionERun1,
-		ActionERun2,
-		ActionSERun1,
-		ActionSERun2,
-		ActionSRun1,
-		ActionSRun2,
-		ActionSWRun1,
-		ActionSWRun2,
-		ActionWRun1,
-		ActionWRun2,
-		ActionNWRun1,
-		ActionNWRun2,
-		// scratch
-		ActionNScratch1,
-		ActionNScratch2,
-		ActionEScratch1,
-		ActionEScratch2,
-		ActionSScratch1,
-		ActionSScratch2,
-		ActionWScratch1,
-		ActionWScratch2,
-	}
-)
+// SupportedActions is a list of implemented action.
+var SupportedActions = []Action{
+	ActionAlert,
+	ActionStill,
+	ActionYawn,
+	// itch
+	ActionItch1,
+	ActionItch2,
+	// sleep
+	ActionSleep1,
+	ActionSleep2,
+	// run
+	ActionNRun1,
+	ActionNRun2,
+	ActionNERun1,
+	ActionNERun2,
+	ActionERun1,
+	ActionERun2,
+	ActionSERun1,
+	ActionSERun2,
+	ActionSRun1,
+	ActionSRun2,
+	ActionSWRun1,
+	ActionSWRun2,
+	ActionWRun1,
+	ActionWRun2,
+	ActionNWRun1,
+	ActionNWRun2,
+	// scratch
+	ActionNScratch1,
+	ActionNScratch2,
+	ActionEScratch1,
+	ActionEScratch2,
+	ActionSScratch1,
+	ActionSScratch2,
+	ActionWScratch1,
+	ActionWScratch2,
+}
 
 type dir string
 
 const (
-	dirW = "W"
+	dirW  = "W"
 	dirNW = "NW"
-	dirN = "N"
+	dirN  = "N"
 	dirNE = "NE"
-	dirE = "E"
+	dirE  = "E"
 	dirSW = "SW"
-	dirS = "S"
+	dirS  = "S"
 	dirSE = "SE"
 )
 
-var (
-	DefaultOptions = Options{
-		Step: 15,
-		Dmax: 20,
-		StillTransition: 1,
-		StillTicks: 4,
-		SleepTicks: 2,
-		AlertTicks: 2,
+var DefaultOptions = Options{
+	Step:            15,
+	Dmax:            20,
+	StillTransition: 1,
+	StillTicks:      4,
+	SleepTicks:      2,
+	AlertTicks:      2,
 
-		YawnTicks: 4,
-		PostYawnTicks: 4,
+	YawnTicks:     4,
+	PostYawnTicks: 4,
 
-		ItchTicks: 1,
-		ItchCount: 6,
-		PostItchTicks: 4,
+	ItchTicks:     1,
+	ItchCount:     6,
+	PostItchTicks: 4,
 
-		ScratchTicks: 2,
-		ScratchCount: 4,
-		PostScratchTicks: 4,
-		ScratchDisableAlert: true,
-	}
-)
+	ScratchTicks:        2,
+	ScratchCount:        4,
+	PostScratchTicks:    4,
+	ScratchDisableAlert: true,
+}
 
 const (
 	π = math.Pi
@@ -255,23 +251,23 @@ func direction(x, y, mx, my float64) dir {
 	dy := y - my
 	α := math.Atan2(dy, dx)
 	switch {
-	case -π * 8/8 <= α && α <= -π * 7/8:
+	case -π*8/8 <= α && α <= -π*7/8:
 		return dirE
-	case -π * 7/8 <= α && α <= -π * 5/8:
+	case -π*7/8 <= α && α <= -π*5/8:
 		return dirSE
-	case -π * 5/8 <= α && α <= -π * 3/8:
+	case -π*5/8 <= α && α <= -π*3/8:
 		return dirS
-	case -π * 3/8 <= α && α <= -π * 1/8:
+	case -π*3/8 <= α && α <= -π*1/8:
 		return dirSW
-	case -π * 1/8 <= α && α <= +π * 1/8:
+	case -π*1/8 <= α && α <= +π*1/8:
 		return dirW
-	case +π * 1/8 <= α && α <= +π * 3/8:
+	case +π*1/8 <= α && α <= +π*3/8:
 		return dirNW
-	case +π * 3/8 <= α && α <= +π * 5/8:
+	case +π*3/8 <= α && α <= +π*5/8:
 		return dirN
-	case +π * 5/8 <= α && α <= +π * 7/8:
+	case +π*5/8 <= α && α <= +π*7/8:
 		return dirNE
-	case +π * 7/8 <= α && α <= +π * 8/8:
+	case +π*7/8 <= α && α <= +π*8/8:
 		return dirE
 	}
 	return ""
@@ -288,15 +284,15 @@ func majorDirection(x, y, mx, my float64) dir {
 	dy := y - my
 	α := math.Atan2(dy, dx)
 	switch {
-	case -π * 4/4 <= α && α <= -π * 3/4:
+	case -π*4/4 <= α && α <= -π*3/4:
 		return dirE
-	case -π * 3/4 <= α && α <= -π * 1/4:
+	case -π*3/4 <= α && α <= -π*1/4:
 		return dirS
-	case -π * 1/4 <= α && α <= +π * 1/4:
+	case -π*1/4 <= α && α <= +π*1/4:
 		return dirW
-	case +π * 1/4 <= α && α <= +π * 3/4:
+	case +π*1/4 <= α && α <= +π*3/4:
 		return dirN
-	case +π * 3/4 <= α && α <= +π * 4/4:
+	case +π*3/4 <= α && α <= +π*4/4:
 		return dirE
 	}
 	return ""
@@ -372,8 +368,8 @@ func (s stateStill) Render(n NekoState, m MouseState, b Options) NekoState {
 }
 
 type stateItch struct {
-	tick uint
-	even bool
+	tick  uint
+	even  bool
 	count uint
 }
 
@@ -393,7 +389,7 @@ func (s stateItch) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateItch) Render(n NekoState, m MouseState, b Options)  NekoState {
+func (s stateItch) Render(n NekoState, m MouseState, b Options) NekoState {
 	if s.even {
 		n.Action = ActionItch2
 	} else {
@@ -423,8 +419,8 @@ func (s statePostItch) Render(n NekoState, m MouseState, b Options) NekoState {
 }
 
 type stateScratch struct {
-	tick uint
-	even bool
+	tick  uint
+	even  bool
 	count uint
 }
 
@@ -527,7 +523,7 @@ func (s stateSleep) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateSleep) Render(n NekoState, m MouseState, b Options)  NekoState {
+func (s stateSleep) Render(n NekoState, m MouseState, b Options) NekoState {
 	if s.even {
 		n.Action = ActionSleep2
 	} else {
