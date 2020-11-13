@@ -4,12 +4,12 @@ import (
 	"math"
 )
 
-type NekoState struct {
+type State struct {
 	X, Y   float64
 	Action Action
 }
 
-type MouseState struct {
+type Pos struct {
 	X, Y float64
 }
 
@@ -298,14 +298,14 @@ func majorDirection(x, y, mx, my float64) dir {
 	return ""
 }
 
-func pointerNearby(n NekoState, m MouseState, b Options) bool {
+func pointerNearby(n State, m Pos, b Options) bool {
 	dx := n.X - m.X
 	dy := n.Y - m.Y
 	d := math.Hypot(dx, dy)
 	return d <= b.Dmax
 }
 
-func makeStep(n *NekoState, m MouseState, b Options) {
+func makeStep(n *State, m Pos, b Options) {
 	dx := n.X - m.X
 	dy := n.Y - m.Y
 	d := math.Hypot(dx, dy)
@@ -318,22 +318,22 @@ func makeStep(n *NekoState, m MouseState, b Options) {
 	return
 }
 
-type ActionState interface {
-	Next(NekoState, MouseState, Options) ActionState
-	Render(NekoState, MouseState, Options) NekoState
+type Transition interface {
+	Next(State, Pos, Options) Transition
+	Render(State, Pos, Options) State
 }
 
-func NewInitialState() ActionState {
+func NewInitialState() Transition {
 	return initialState{}
 }
 
 type initialState struct{}
 
-func (initialState) Next(n NekoState, m MouseState, b Options) ActionState {
+func (initialState) Next(n State, m Pos, b Options) Transition {
 	return stateStill{}
 }
 
-func (initialState) Render(n NekoState, m MouseState, b Options) NekoState {
+func (initialState) Render(n State, m Pos, b Options) State {
 	return n
 }
 
@@ -341,7 +341,7 @@ type stateStill struct {
 	tick uint
 }
 
-func (s stateStill) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s stateStill) Next(n State, m Pos, b Options) Transition {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -352,7 +352,7 @@ func (s stateStill) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateStill) selectNext(n NekoState, m MouseState, b Options) ActionState {
+func (s stateStill) selectNext(n State, m Pos, b Options) Transition {
 	switch b.StillTransition {
 	case 1:
 		return stateItch{}
@@ -362,7 +362,7 @@ func (s stateStill) selectNext(n NekoState, m MouseState, b Options) ActionState
 	return stateYawn{}
 }
 
-func (s stateStill) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s stateStill) Render(n State, m Pos, b Options) State {
 	n.Action = ActionStill
 	return n
 }
@@ -373,7 +373,7 @@ type stateItch struct {
 	count uint
 }
 
-func (s stateItch) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s stateItch) Next(n State, m Pos, b Options) Transition {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -389,7 +389,7 @@ func (s stateItch) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateItch) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s stateItch) Render(n State, m Pos, b Options) State {
 	if s.even {
 		n.Action = ActionItch2
 	} else {
@@ -402,7 +402,7 @@ type statePostItch struct {
 	tick uint
 }
 
-func (s statePostItch) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s statePostItch) Next(n State, m Pos, b Options) Transition {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -413,7 +413,7 @@ func (s statePostItch) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s statePostItch) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s statePostItch) Render(n State, m Pos, b Options) State {
 	n.Action = ActionStill
 	return n
 }
@@ -424,7 +424,7 @@ type stateScratch struct {
 	count uint
 }
 
-func (s stateScratch) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s stateScratch) Next(n State, m Pos, b Options) Transition {
 	if !b.ScratchDisableAlert && !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -440,7 +440,7 @@ func (s stateScratch) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateScratch) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s stateScratch) Render(n State, m Pos, b Options) State {
 	d := majorDirection(n.X, n.Y, m.X, m.Y)
 	n.Action = scratchAction(d, s.even)
 	return n
@@ -450,7 +450,7 @@ type statePostScratch struct {
 	tick uint
 }
 
-func (s statePostScratch) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s statePostScratch) Next(n State, m Pos, b Options) Transition {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -461,7 +461,7 @@ func (s statePostScratch) Next(n NekoState, m MouseState, b Options) ActionState
 	return s
 }
 
-func (s statePostScratch) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s statePostScratch) Render(n State, m Pos, b Options) State {
 	n.Action = ActionStill
 	return n
 }
@@ -470,7 +470,7 @@ type stateYawn struct {
 	tick uint
 }
 
-func (s stateYawn) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s stateYawn) Next(n State, m Pos, b Options) Transition {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -481,7 +481,7 @@ func (s stateYawn) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateYawn) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s stateYawn) Render(n State, m Pos, b Options) State {
 	n.Action = ActionYawn
 	return n
 }
@@ -490,7 +490,7 @@ type statePostYawn struct {
 	tick uint
 }
 
-func (s statePostYawn) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s statePostYawn) Next(n State, m Pos, b Options) Transition {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -501,7 +501,7 @@ func (s statePostYawn) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s statePostYawn) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s statePostYawn) Render(n State, m Pos, b Options) State {
 	n.Action = ActionStill
 	return n
 }
@@ -511,7 +511,7 @@ type stateSleep struct {
 	even bool
 }
 
-func (s stateSleep) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s stateSleep) Next(n State, m Pos, b Options) Transition {
 	if !pointerNearby(n, m, b) {
 		return stateAlert{}
 	}
@@ -523,7 +523,7 @@ func (s stateSleep) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateSleep) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s stateSleep) Render(n State, m Pos, b Options) State {
 	if s.even {
 		n.Action = ActionSleep2
 	} else {
@@ -536,7 +536,7 @@ type stateAlert struct {
 	tick uint
 }
 
-func (s stateAlert) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s stateAlert) Next(n State, m Pos, b Options) Transition {
 	if pointerNearby(n, m, b) {
 		return stateStill{}
 	}
@@ -547,7 +547,7 @@ func (s stateAlert) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateAlert) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s stateAlert) Render(n State, m Pos, b Options) State {
 	n.Action = ActionAlert
 	return n
 }
@@ -557,7 +557,7 @@ type stateRun struct {
 	even bool
 }
 
-func (s stateRun) Next(n NekoState, m MouseState, b Options) ActionState {
+func (s stateRun) Next(n State, m Pos, b Options) Transition {
 	if pointerNearby(n, m, b) {
 		return stateStill{}
 	}
@@ -569,7 +569,7 @@ func (s stateRun) Next(n NekoState, m MouseState, b Options) ActionState {
 	return s
 }
 
-func (s stateRun) Render(n NekoState, m MouseState, b Options) NekoState {
+func (s stateRun) Render(n State, m Pos, b Options) State {
 	d := direction(n.X, n.Y, m.X, m.Y)
 	n.Action = runAction(d, s.even)
 	makeStep(&n, m, b)

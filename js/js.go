@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	n, m, b := neko.NekoState{}, neko.MouseState{}, neko.DefaultOptions
+	n, m, b := neko.State{}, neko.Pos{}, neko.DefaultOptions
 
 	mouseUpdate := js.NewEventCallback(0, func(ev js.Value) {
 		m.X, m.Y = ev.Get("clientX").Float(), ev.Get("clientY").Float()
@@ -68,7 +68,7 @@ func setupElement(e js.Value) {
 	styles.Set("imageRendering", "pixelated")
 }
 
-func displayState(e js.Value, n neko.NekoState) {
+func displayState(e js.Value, n neko.State) {
 	style := e.Get("style")
 	style.Set("left", f2px(n.X))
 	style.Set("top", f2px(n.Y))
